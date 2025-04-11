@@ -1,3 +1,17 @@
 export const en = {
-  translation: {},
+  translation: {
+    setup_embed: "Embed Chat Settings",
+    reset_conversation: "Reset Conversation",
+    select_language: "Select Language",
+    language: "Language",
+    save: "Save",
+    simulate_conversation: "Simulate a new conversation",
+    home: "Home",
+    page_setting: "Page Settings",
+    vietnamese: "Vietnamese",
+    english: "English",
+    korean: "Korean",
+    japanese: "Japanese",
+    chinese: "Chinese",
+  },
 };

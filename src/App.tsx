@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { Route, Routes, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
@@ -11,32 +12,45 @@ import useChatbox from "./hooks/useChatbox";
 
 export default function App() {
   /**
-   * Lấy thông tin từ URL
+   *  Lay params từ url
    */
   const [search_params] = useSearchParams();
-
   /**
-   * Access token từ URL hoặc localStorage
+   *  Lay page_id tu url
    */
   const PAGE_ID = search_params.get("page_id");
   /**
-   * Ngôn ngữ dự phòng
+   * Lay locale tu localStorage
    */
-  const LOCALE = localStorage.getItem("locale") || "vi";
+  const [locale, setLocale] = useState(
+    () => localStorage.getItem("locale") || "vi"
+  );
 
+  /** Cập nhật lại locale khi localStorage thay đổi (nếu bạn đổi ở Setting) */
+  useEffect(() => {
+    /**
+     * Cập nhật locale từ local storage nếu có thay đổi
+     */
+    const handleStorage = () => {
+      const NEW_LOCALE = localStorage.getItem("locale") || "vi";
+      setLocale(NEW_LOCALE);
+      console.log(NEW_LOCALE, "new locale");
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+  /**
+   * GỌi hook chatbox
+   */
   useChatbox({
-    page_id: PAGE_ID, // Chỉ khởi tạo khi visible
-    locale: LOCALE,
-    // userData: {
-    //   name: "User Name",
-    //   email: "user@example.com",
-    // },
+    page_id: PAGE_ID,
+    locale: locale,
   });
 
   return (
     <div className="min-h-screen min-w-screen flex flex-col relative bg-custom-gradient">
       <Navbar />
-
       <div className="flex flex-grow min-h-0 pt-16 w-full">
         <Routes>
           <Route path="/" element={<Home />} />

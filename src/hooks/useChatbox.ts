@@ -43,25 +43,36 @@ const useChatbox = ({
       initializeBBH();
       return;
     }
-
+    /**
+     * Tạo script
+     */
     const SCRIPT = document.createElement("script");
-    SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
-    // SCRIPT.src = "http://192.168.1.174:9090/sdk.js";
+    // SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
+    SCRIPT.src = "http://192.168.1.174:9090/sdk.js";
     SCRIPT.async = true;
-
+    /**
+     * Xu ly khi load xong
+     * @returns
+     */
     SCRIPT.onload = () => initializeBBH();
     SCRIPT.onerror = () => {
       const error = new Error("Failed to load BBH script");
       onError?.(error);
       console.error(error.message);
     };
-
+    /**
+     * Thêm script vào body
+     */
     document.body.appendChild(SCRIPT);
-
+    /**
+     * Xu ly khi unmount
+     */
     return () => {
       document.body.removeChild(SCRIPT);
     };
-
+    /**
+     * Khoi tao BBH
+     */
     function initializeBBH() {
       try {
         if (!window.BBH) {
@@ -86,7 +97,9 @@ const useChatbox = ({
         console.error(err.message);
       }
     }
-
+    /**
+     * Gui thong tin nguoi dung
+     */
     function sendUserData() {
       setTimeout(() => {
         const iframe = document.querySelector(
