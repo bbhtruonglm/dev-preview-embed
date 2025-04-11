@@ -1,4 +1,5 @@
 import "./index.css";
+import "./i18n.ts";
 
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";

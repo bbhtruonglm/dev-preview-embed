@@ -19,7 +19,6 @@ export default function App() {
    * Access token từ URL hoặc localStorage
    */
   const PAGE_ID = search_params.get("page_id");
-  console.log(PAGE_ID, "page_id");
 
   useChatbox({
     page_id: PAGE_ID, // Chỉ khởi tạo khi visible
@@ -30,10 +29,10 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen min-w-screen flex flex-col relative">
+    <div className="min-h-screen min-w-screen flex flex-col relative bg-custom-gradient">
       <Navbar />
 
-      <div className="flex-grow min-h-0 pt-16">
+      <div className="flex flex-grow min-h-0 pt-16 w-full">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />

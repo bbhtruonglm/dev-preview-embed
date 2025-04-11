@@ -26,38 +26,37 @@ const useChatbox = ({
   onLoaded,
   onError,
 }: UseChatboxOptions) => {
-  console.log(page_id, "ưtff");
   useEffect(() => {
     if (!page_id) {
-      const error = new Error("page_id is required");
-      onError?.(error);
-      console.error(error.message);
+      const ERROR = new Error("page_id is required");
+      onError?.(ERROR);
+      console.error(ERROR.message);
       return;
     }
 
-    const existingScript = document.querySelector(
+    const EXISTING_SCRIPT = document.querySelector(
       'script[src*="botbanhang.vn"]'
     );
-    if (existingScript) {
+    if (EXISTING_SCRIPT) {
       initializeBBH();
       return;
     }
 
-    const script = document.createElement("script");
-    script.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
-    script.async = true;
+    const SCRIPT = document.createElement("script");
+    SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
+    SCRIPT.async = true;
 
-    script.onload = () => initializeBBH();
-    script.onerror = () => {
+    SCRIPT.onload = () => initializeBBH();
+    SCRIPT.onerror = () => {
       const error = new Error("Failed to load BBH script");
       onError?.(error);
       console.error(error.message);
     };
 
-    document.body.appendChild(script);
+    document.body.appendChild(SCRIPT);
 
     return () => {
-      document.body.removeChild(script);
+      document.body.removeChild(SCRIPT);
     };
 
     function initializeBBH() {
