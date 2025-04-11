@@ -20,10 +20,12 @@ const Setting = () => {
   const [search_params] = useSearchParams();
   /** checkbox Thẻ hội thoại */
   const [reset_conversation, setResetConversation] = useState(false);
+  /** Thêm locale từ localStorage */
+  const LOCALE = localStorage.getItem("locale") || "vi";
   /**
    * Ngôn ngữ
    */
-  const [locale, setLocale] = useState<string | number>("vi");
+  const [locale, setLocale] = useState<string | number>(LOCALE);
   /** Embed Iframe */
   const IFRAME = document.querySelector(
     "#BBH-EMBED-IFRAME"
@@ -37,12 +39,16 @@ const Setting = () => {
 
   /** Hàm confirm */
   const handleConfirm = () => {
+    /** Lưu locale vào localStorage */
+    localStorage.setItem("locale", locale.toString());
+    /** Gửi message xuống SDK */
     if (IFRAME?.contentWindow) {
       IFRAME.contentWindow.postMessage(
         {
-          from: "parent-app",
+          from: "parent-app-preview",
           reset_conversation: reset_conversation,
           locale: locale,
+          reset_page_id: PAGE_ID,
         },
         "*"
       );
@@ -50,8 +56,24 @@ const Setting = () => {
   };
   return (
     <div className="flex h-full w-full">
-      <div className="flex flex-col justify-between p-4 border bg-white border-gray-300 rounded-lg w-1/2">
-        <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col gap-y-2 p-4 border bg-white border-gray-300 md:rounded-lg w-full md:w-1/2">
+        <div className="flex flex-shrink-0 h-10 justify-end w-full">
+          <button
+            onClick={() => {
+              /**
+               *  Lưu cuộc hội thoại
+               */
+              handleConfirm();
+
+              setResetConversation(false);
+            }}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            {t("save")}
+          </button>
+        </div>
+        <DividerY />
+        <div className="flex flex-col gap-y-2">
           <CheckboxNew
             checked={reset_conversation}
             label={t("reset_conversation")}
@@ -74,21 +96,6 @@ const Setting = () => {
               }}
             />
           </div>
-        </div>
-        <div className="flex flex-shrink-0 h-10 justify-end w-full">
-          <button
-            onClick={() => {
-              /**
-               *  Lưu cuộc hội thoại
-               */
-              handleConfirm();
-
-              setResetConversation(false);
-            }}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            {t("save")}
-          </button>
         </div>
       </div>
     </div>

@@ -19,9 +19,14 @@ export default function App() {
    * Access token từ URL hoặc localStorage
    */
   const PAGE_ID = search_params.get("page_id");
+  /**
+   * Ngôn ngữ dự phòng
+   */
+  const LOCALE = localStorage.getItem("locale") || "vi";
 
   useChatbox({
     page_id: PAGE_ID, // Chỉ khởi tạo khi visible
+    locale: LOCALE,
     // userData: {
     //   name: "User Name",
     //   email: "user@example.com",

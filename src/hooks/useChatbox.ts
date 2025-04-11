@@ -16,6 +16,7 @@ interface UseChatboxOptions {
     phone?: string;
     clientId?: string;
   };
+  locale?: string;
   onLoaded?: () => void;
   onError?: (error: Error) => void;
 }
@@ -23,6 +24,7 @@ interface UseChatboxOptions {
 const useChatbox = ({
   page_id,
   userData,
+  locale,
   onLoaded,
   onError,
 }: UseChatboxOptions) => {
@@ -43,7 +45,8 @@ const useChatbox = ({
     }
 
     const SCRIPT = document.createElement("script");
-    SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
+    // SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
+    SCRIPT.src = "http://192.168.1.174:9090/sdk.js";
     SCRIPT.async = true;
 
     SCRIPT.onload = () => initializeBBH();
@@ -67,7 +70,7 @@ const useChatbox = ({
 
         window.BBH.init({
           page_id: page_id || "",
-          config: {},
+          config: { locale: locale },
         });
 
         console.log("BBH initialized with page_id:", page_id);
