@@ -86,15 +86,17 @@ const Setting = () => {
             <span className="text-sm font-medium flex-shrink-0 ">
               {t("select_language")}
             </span>
-            <CustomSelectSearch
-              label={t("language")}
-              data={LANGUAGES}
-              selected={LANGUAGES.find((e) => e.value === locale)}
-              value={locale}
-              setSelected={(e) => {
-                setLocale && setLocale(e.value);
-              }}
-            />
+            <div className="w-full md:max-w-60">
+              <CustomSelectSearch
+                label={t("language")}
+                data={LANGUAGES}
+                selected={LANGUAGES.find((e) => e.value === locale)}
+                value={locale}
+                setSelected={(e) => {
+                  setLocale && setLocale(e.value);
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
