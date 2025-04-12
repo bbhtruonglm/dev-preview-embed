@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import CheckboxNew from "../checkbox/CheckboxNew";
 import CustomSelectSearch from "../select/CustomSelectSearch";
 import DividerY from "../Divider/DividerY";
+import { NetworkContext } from "../NWProvider";
 import { t } from "i18next";
 import { useSearchParams } from "react-router-dom";
 
@@ -16,6 +17,12 @@ const Setting = () => {
     { key: t("japanese"), value: "jp" },
     { key: t("chinese"), value: "cn" },
   ];
+  /**
+   * trạng thái online
+   */
+  const { is_online: IS_ONLINE, show_reconnect: SHOW_RECONNECT } =
+    useContext(NetworkContext);
+
   /**
    * Lấy thông tin từ URL
    */
@@ -94,7 +101,17 @@ const Setting = () => {
   };
   return (
     <div className="flex h-full w-full">
-      <div className="flex flex-col gap-y-2 p-4 border bg-white border-gray-300 md:rounded-lg w-full md:w-1/2">
+      {!IS_ONLINE && (
+        <div className="flex justify-center items-center fixed inset-0 bg-red-500 p-2 h-8 text-white text-sm z-50">
+          {t("disconnected")}
+        </div>
+      )}
+      {SHOW_RECONNECT && (
+        <div className="flex justify-center items-center fixed inset-0 bg-green-500 p-2 h-8 text-white text-sm z-50">
+          {t("reconnected")}
+        </div>
+      )}
+      <div className="flex flex-col gap-y-2 p-4 bg-white md:rounded-lg w-full md:w-1/2">
         {/* <div className="flex flex-shrink-0 h-10 justify-end w-full">
           <button
             onClick={() => {

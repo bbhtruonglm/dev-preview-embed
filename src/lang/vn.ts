@@ -15,5 +15,8 @@ export const vn = {
     japanese: "Tiếng Nhật",
     chinese: "Tiếng Trung",
     page_is_not_website: "Trang được chọn không phải trang web",
+    /** Mất mạng */
+    disconnected: "Mất kết nối mạng...",
+    reconnected: "Đã kết nối lại mạng",
   },
 };

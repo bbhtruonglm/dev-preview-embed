@@ -15,5 +15,8 @@ export const en = {
     chinese: "Chinese",
 
     page_is_not_website: "The selected page is not a website.",
+    /** Network lost */
+    disconnected: "Network disconnected...",
+    reconnected: "Network reconnected",
   },
 };
