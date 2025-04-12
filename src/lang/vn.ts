@@ -14,5 +14,6 @@ export const vn = {
     korean: "Tiếng Hàn",
     japanese: "Tiếng Nhật",
     chinese: "Tiếng Trung",
+    page_is_not_website: "Trang được chọn không phải trang web",
   },
 };

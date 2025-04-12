@@ -9,6 +9,8 @@
       #f2ecf4 29%, #efecf3 36%, #eeebf6 43%, #ebeaf9 50%, #e8e8f8 57%,
       #e6e7f8 64%, #e4e5f9 71%, #e3e4f8 79%, #e2e3f8 86%, #e0e0fc 93%,
       #dcdffc 100%;
+    /** Định nghĩa animation shake */
+    --shake: shake 0.5s ease-in-out;
   }
 
   .bg-custom-gradient {
@@ -18,8 +20,32 @@
   .bg-custom-gradient-vertical {
     background-image: linear-gradient(to bottom, var(--gradient-colors));
   }
-}
+  /* Định nghĩa keyframes shake */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-5px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(5px);
+    }
+  }
 
+  /* Thêm utility class */
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+}
 /* #root {
   max-width: 1280px;
   margin: 0 auto;

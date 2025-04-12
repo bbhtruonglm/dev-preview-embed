@@ -13,5 +13,7 @@ export const en = {
     korean: "Korean",
     japanese: "Japanese",
     chinese: "Chinese",
+
+    page_is_not_website: "The selected page is not a website.",
   },
 };

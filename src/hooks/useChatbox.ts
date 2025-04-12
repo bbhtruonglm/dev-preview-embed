@@ -1,41 +1,78 @@
+import { showToast } from "@/stores/toastSlice";
+import { t } from "i18next";
+import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-
+/**
+ * Khai báo global object BBH
+ */
 declare global {
+  /**
+   * Khai báo global object BBH
+   */
   interface Window {
     BBH?: {
       init: (config: { page_id: string; config?: Record<string, any> }) => void;
     };
   }
 }
-
+/**
+ * Khai báo options cho useChatbox
+ */
 interface UseChatboxOptions {
+  /** Id Trang */
   page_id: string | null;
+  /** Thông tin user */
   userData?: {
+    /** Tên */
     name?: string;
+    /** Email */
     email?: string | undefined;
+    /** SDT */
     phone?: string;
+    /** ID */
     clientId?: string;
   };
+  /** Ngôn ngữ */
   locale?: string;
+  /** Loại page trang */
+  page_type?: string;
+  /** Fn sử dụng khi script loaded */
   onLoaded?: () => void;
+  /** Fn sử dụng khi script load that bai */
   onError?: (error: Error) => void;
 }
 
 const useChatbox = ({
   page_id,
   userData,
+  page_type,
   locale,
   onLoaded,
   onError,
 }: UseChatboxOptions) => {
+  const dispatch = useDispatch();
   useEffect(() => {
-    if (!page_id) {
+    /**
+     * Nếu không có page_id hoặc page_type thi bao loi
+     */
+    if (!page_id || !page_type) {
       const ERROR = new Error("page_id is required");
       onError?.(ERROR);
       console.error(ERROR.message);
       return;
     }
+    /**
+     * Kiem tra xem page_type co phai la website khong
+     */
+    if (page_type !== "WEBSITE") {
+      /** Show toast lỗi */
+      dispatch(showToast({ message: t("page_is_not_website"), type: "error" }));
+      return;
+    }
 
+    /**
+     * Kiem tra xem script da duoc them vao chua
+     */
     const EXISTING_SCRIPT = document.querySelector(
       'script[src*="botbanhang.vn"]'
     );
@@ -47,8 +84,8 @@ const useChatbox = ({
      * Tạo script
      */
     const SCRIPT = document.createElement("script");
-    SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
-    // SCRIPT.src = "http://192.168.1.174:9090/sdk.js";
+    // SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
+    SCRIPT.src = "http://192.168.1.174:9090/sdk.js";
     SCRIPT.async = true;
     /**
      * Xu ly khi load xong
@@ -120,7 +157,7 @@ const useChatbox = ({
         }
       }, 1000);
     }
-  }, [page_id]);
+  }, [page_id, page_type]);
 };
 
 export default useChatbox;
