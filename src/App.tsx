@@ -98,8 +98,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen min-w-screen flex flex-col relative bg-custom-gradient">
-      <Navbar />
-      <div className="flex flex-grow min-h-0 pt-18 md:pt-16 w-full">
+      {/* <Navbar /> */}
+      <div className="flex flex-grow min-h-0  w-full">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
