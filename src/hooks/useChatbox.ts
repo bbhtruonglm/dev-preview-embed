@@ -84,8 +84,10 @@ const useChatbox = ({
      * Tạo script
      */
     const SCRIPT = document.createElement("script");
-    SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
-    // SCRIPT.src = "http://192.168.1.174:9090/sdk.js";
+    // SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
+    SCRIPT.src = "https://bbh-embed-chat-sdk.vercel.app/dist/sdk.min.js";
+
+    // SCRIPT.src = "http://192.168.1.10:9090/sdk.js";
     SCRIPT.async = true;
     /**
      * Xu ly khi load xong
