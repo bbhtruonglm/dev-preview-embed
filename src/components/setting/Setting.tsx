@@ -29,7 +29,7 @@ const Setting = () => {
   const [search_params] = useSearchParams();
 
   /** Thêm locale từ localStorage */
-  const LOCALE = localStorage.getItem("locale") || "vi";
+  const LOCALE = localStorage.getItem("locale") || "auto";
 
   /**
    * Ngôn ngữ
@@ -130,7 +130,7 @@ const Setting = () => {
             onClick={() => {
               handleReset();
             }}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-60"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded min-w-60 max-w-96 truncate"
           >
             {t("simulate_conversation")}
           </button>
