@@ -1,3 +1,4 @@
+import { saveLocale, sendMessageToIframe } from "./helper";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import CheckboxNew from "../checkbox/CheckboxNew";
@@ -69,36 +70,54 @@ const Setting = () => {
   const PAGE_ID = search_params.get("page_id");
 
   /** Hàm confirm */
+  // const handleReset = () => {
+  //   /** Gửi message xuống SDK */
+  //   if (IFRAME_REF?.current?.contentWindow) {
+  //     IFRAME_REF.current?.contentWindow.postMessage(
+  //       {
+  //         from: "parent-app-preview",
+  //         reset_conversation: true,
+  //         reset_page_id: PAGE_ID,
+  //       },
+  //       "*"
+  //     );
+  //   }
+  // };
+  // /** Hàm confirm */
+  // const handleChangeLanguage = (locale: any) => {
+  //   /** Lưu locale vào localStorage */
+  //   localStorage.setItem("locale", locale.toString());
+  //   setLocale(locale);
+  //   /** Gửi message xuống SDK */
+  //   if (IFRAME_REF?.current?.contentWindow) {
+  //     IFRAME_REF.current?.contentWindow.postMessage(
+  //       {
+  //         from: "parent-app-preview",
+  //         locale: locale,
+  //         reset_page_id: PAGE_ID,
+  //       },
+  //       "*"
+  //     );
+  //   }
+  // };
   const handleReset = () => {
-    /** Gửi message xuống SDK */
-    if (IFRAME_REF?.current?.contentWindow) {
-      IFRAME_REF.current?.contentWindow.postMessage(
-        {
-          from: "parent-app-preview",
-          reset_conversation: true,
-          reset_page_id: PAGE_ID,
-        },
-        "*"
-      );
-    }
+    sendMessageToIframe({
+      from: "parent-app-preview",
+      reset_conversation: true,
+      reset_page_id: PAGE_ID,
+    });
   };
-  /** Hàm confirm */
+
   const handleChangeLanguage = (locale: any) => {
-    /** Lưu locale vào localStorage */
-    localStorage.setItem("locale", locale.toString());
+    saveLocale(locale.toString());
     setLocale(locale);
-    /** Gửi message xuống SDK */
-    if (IFRAME_REF?.current?.contentWindow) {
-      IFRAME_REF.current?.contentWindow.postMessage(
-        {
-          from: "parent-app-preview",
-          locale: locale,
-          reset_page_id: PAGE_ID,
-        },
-        "*"
-      );
-    }
+    sendMessageToIframe({
+      from: "parent-app-preview",
+      locale: locale,
+      reset_page_id: PAGE_ID,
+    });
   };
+
   return (
     <div className="flex h-full w-full">
       {!IS_ONLINE && (
@@ -112,18 +131,6 @@ const Setting = () => {
         </div>
       )}
       <div className="flex flex-col gap-y-2 p-4 bg-white md:rounded-lg w-full md:w-1/2">
-        {/* <div className="flex flex-shrink-0 h-10 justify-end w-full">
-          <button
-            onClick={() => {
-              handleConfirm();
-
-              setResetConversation(false);
-            }}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            {t("save")}
-          </button>
-        </div> */}
         {/* <DividerY /> */}
         <div className="flex flex-col gap-y-4">
           <button
