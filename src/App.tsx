@@ -56,8 +56,11 @@ export default function App() {
       /**
        * Lay thong tin cua page
        */
+
       const RES = await fetch(
-        `https://chatbox-public-v2.botbanhang.vn/embed/page/read_page?page_id=${page_id}`
+        import.meta.env.VITE_ENV === "production"
+          ? `https://chatbox-public-v2.botbanhang.vn/embed/page/read_page?page_id=${page_id}`
+          : `https://dev-api.botbanhang.vn/v1/n7_public/embed/page/read_page?page_id=${page_id}`
       );
       /**
        * Parse data json
