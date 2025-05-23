@@ -57,9 +57,7 @@ export default function App() {
        * Lay thong tin cua page
        */
       const RES = await fetch(
-        import.meta.env.VITE_ENV === "production"
-          ? `https://chatbox-public-v2.botbanhang.vn/embed/page/read_page?page_id=${page_id}`
-          : `https://dev-api.botbanhang.vn/v1/n7_public/embed/page/read_page?page_id=${page_id}`
+        `https://chatbox-public-v2.botbanhang.vn/embed/page/read_page?page_id=${page_id}`
       );
       /**
        * Parse data json
@@ -100,8 +98,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen min-w-screen flex flex-col relative bg-custom-gradient">
-      {/* <Navbar /> */}
-      <div className="flex flex-grow min-h-0  w-full">
+      <Navbar />
+      <div className="flex flex-grow min-h-0 w-full pt-18">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />

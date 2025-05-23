@@ -1,7 +1,10 @@
+import { useDispatch, useSelector } from "react-redux";
+
+import { selectViewGlobal } from "@/stores/appSlice";
 import { showToast } from "@/stores/toastSlice";
 import { t } from "i18next";
-import { useDispatch } from "react-redux";
 import { useEffect } from "react";
+
 /**
  * Khai báo global object BBH
  */
@@ -12,6 +15,7 @@ declare global {
   interface Window {
     BBH?: {
       init: (config: { page_id: string; config?: Record<string, any> }) => void;
+      destroy: () => void;
     };
   }
 }
@@ -51,6 +55,43 @@ const useChatbox = ({
   onError,
 }: UseChatboxOptions) => {
   const dispatch = useDispatch();
+  /**
+   * Lấy device
+   */
+  const DEVICE_GLOBAL = useSelector(selectViewGlobal);
+  /** Hàm dịch chuyển embed vào thẻ preview container */
+  function moveIframeIntoContainer() {
+    /**
+     * Tạo interval để kiểm tra xem iframe đã được tạo chưa
+     * Nếu có thì di chuyển nó vào thẻ preview container
+     */
+    const INTERVAL = setInterval(() => {
+      /**
+       * Lấy iframe và container
+       * @type {HTMLIFrameElement}
+       */
+      const IFRAME = document.getElementById("BBH-EMBED-IFRAME");
+      /**
+       * Lấy container
+       * @type {HTMLDivElement}
+       */
+
+      const CONTAINER = document.getElementById("BBH-EMBED-CONTAINER");
+
+      /**
+       * Nếu IFRAME và CONTAINER tồn tại thì di chuyển IFRAME vào CONTAINER
+       */
+      if (IFRAME && CONTAINER) {
+        CONTAINER.appendChild(IFRAME);
+        IFRAME.style.width = "100%";
+        IFRAME.style.height = "100%";
+        IFRAME.style.border = "none";
+        clearInterval(INTERVAL);
+        console.log("➡ BBH iframe moved into container.");
+      }
+    }, 300);
+  }
+
   useEffect(() => {
     /**
      * Nếu không có page_id hoặc page_type thi bao loi
@@ -84,11 +125,10 @@ const useChatbox = ({
      * Tạo script
      */
     const SCRIPT = document.createElement("script");
-    // SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js"; // Production
-    SCRIPT.src = "https://bbh-embed-chat-sdk.vercel.app/dist/sdk.min.js"; //Development
+    // SCRIPT.src = "https://chatbox-embed-sdk.botbanhang.vn/dist/sdk.min.js";
 
-    // SCRIPT.src = "http://192.168.1.198:9090/sdk.js";
-    // SCRIPT.src = "http://192.168.10.41:9090/sdk.js";
+    SCRIPT.src = "https://bbh-embed-chat-sdk.vercel.app/dist/sdk.min.js"; //Development
+    // SCRIPT.src = "http://192.168.1.106:9090/sdk.js";
     SCRIPT.async = true;
     /**
      * Xu ly khi load xong
@@ -127,6 +167,9 @@ const useChatbox = ({
         console.log("BBH initialized with page_id:", page_id);
         onLoaded?.();
 
+        /** 👉 Chờ iframe xuất hiện và di chuyển nó */
+        // moveIframeIntoContainer();
+
         sendUserData();
       } catch (error) {
         const err =
@@ -161,6 +204,71 @@ const useChatbox = ({
       }, 1000);
     }
   }, [page_id, page_type]);
+
+  // useEffect(() => {
+  //   /** Chờ iframe move xong */
+  //   const TIME_OUT = setTimeout(() => {
+  //     /**
+  //      * Nếu không có page_id thì return
+  //      */
+  //     if (window.BBH && page_id && page_type === "WEBSITE") {
+  //       window.BBH?.destroy();
+  //       /** Gọi lại init sau khi iframe đã được chuyển vị trí */
+  //       window.BBH.init({
+  //         page_id: page_id,
+  //         config: { locale },
+  //       });
+  //     }
+  //     /** delay nhỏ để đảm bảo đã move xong */
+  //   }, 500);
+
+  //   return () => clearTimeout(TIME_OUT);
+  // }, [DEVICE_GLOBAL]);
+  useEffect(() => {
+    console.log(DEVICE_GLOBAL, "DEVICE_GLOBAL");
+    const TIME_OUT = setTimeout(() => {
+      if (window.BBH && page_id && page_type === "WEBSITE") {
+        window.BBH?.destroy();
+
+        // Gọi lại init
+        window.BBH.init({
+          page_id,
+          config: { locale },
+        });
+
+        // 👉 Phải move lại iframe sau khi init
+        moveIframeIntoContainer();
+
+        // 👉 Gửi lại thông tin user nếu cần
+        // if (userData) {
+        //   setTimeout(() => {
+        //     const iframe = document.querySelector(
+        //       "#BBH-EMBED-IFRAME"
+        //     ) as HTMLIFrameElement;
+        //     if (iframe?.contentWindow) {
+        //       iframe.contentWindow.postMessage(
+        //         {
+        //           from: "parent-app",
+        //           user_name: userData.name,
+        //           user_email: userData.email,
+        //           user_phone: userData.phone,
+        //           client_id: userData.clientId,
+        //         },
+        //         "*"
+        //       );
+        //       console.log("User data resent to iframe");
+        //     }
+        //   }, 1000);
+        // }
+
+        console.log(
+          "✅ BBH re-initialized and iframe moved (on device change)"
+        );
+      }
+    }, 500); // delay nhỏ để init kịp render iframe
+
+    return () => clearTimeout(TIME_OUT);
+  }, [DEVICE_GLOBAL]);
 };
 
 export default useChatbox;

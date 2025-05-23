@@ -1,23 +1,21 @@
-import { saveLocale, sendMessageToIframe } from "./helper";
-import { useContext, useEffect, useRef, useState } from "react";
+import {
+  selectLocaleGlobal,
+  selectPageUrlGlobal,
+  selectResetGlobal,
+  selectViewGlobal,
+  setPageUrlGlobal,
+  setResetGlobal,
+  setSubPageUrlGlobal,
+} from "@/stores/appSlice";
+import { use, useContext, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import CheckboxNew from "../checkbox/CheckboxNew";
-import CustomSelectSearch from "../select/CustomSelectSearch";
-import DividerY from "../Divider/DividerY";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { NetworkContext } from "../NWProvider";
 import { t } from "i18next";
 import { useSearchParams } from "react-router-dom";
 
 const Setting = () => {
-  /** Mock Ngôn ngữ */
-  const LANGUAGES = [
-    { key: t("page_setting"), value: "auto" },
-    { key: t("vietnamese"), value: "vi" },
-    { key: t("english"), value: "en" },
-    { key: t("korean"), value: "kr" },
-    { key: t("japanese"), value: "jp" },
-    { key: t("chinese"), value: "cn" },
-  ];
   /**
    * trạng thái online
    */
@@ -29,17 +27,30 @@ const Setting = () => {
    */
   const [search_params] = useSearchParams();
 
-  /** Thêm locale từ localStorage */
-  const LOCALE = localStorage.getItem("locale") || "auto";
-
-  /**
-   * Ngôn ngữ
-   */
-  const [locale, setLocale] = useState<string | number>(LOCALE);
   /**
    * IFrame
    */
   const IFRAME_REF = useRef<HTMLIFrameElement | null>(null);
+
+  /** Reset conversation */
+  const RESET_GLOBAL = useSelector(selectResetGlobal);
+
+  /** Locale global */
+  const LOCALE_GLOBAL = useSelector(selectLocaleGlobal);
+  /** Thiết bị hiện tại */
+  const DEVICE_GLOBAL = useSelector(selectViewGlobal);
+  /**
+   * Lấy page_id từ url
+   */
+  const PAGE_URL_GLOBAL = useSelector(selectPageUrlGlobal);
+
+  /** page_url*/
+  const [page_url, setPageUrl] = useState<string | number>("");
+
+  /**
+   * Khai báo dispatch
+   */
+  const dispatch = useDispatch();
 
   useEffect(() => {
     /**
@@ -70,56 +81,92 @@ const Setting = () => {
   const PAGE_ID = search_params.get("page_id");
 
   /** Hàm confirm */
-  // const handleReset = () => {
-  //   /** Gửi message xuống SDK */
-  //   if (IFRAME_REF?.current?.contentWindow) {
-  //     IFRAME_REF.current?.contentWindow.postMessage(
-  //       {
-  //         from: "parent-app-preview",
-  //         reset_conversation: true,
-  //         reset_page_id: PAGE_ID,
-  //       },
-  //       "*"
-  //     );
-  //   }
-  // };
-  // /** Hàm confirm */
-  // const handleChangeLanguage = (locale: any) => {
-  //   /** Lưu locale vào localStorage */
-  //   localStorage.setItem("locale", locale.toString());
-  //   setLocale(locale);
-  //   /** Gửi message xuống SDK */
-  //   if (IFRAME_REF?.current?.contentWindow) {
-  //     IFRAME_REF.current?.contentWindow.postMessage(
-  //       {
-  //         from: "parent-app-preview",
-  //         locale: locale,
-  //         reset_page_id: PAGE_ID,
-  //       },
-  //       "*"
-  //     );
-  //   }
-  // };
   const handleReset = () => {
-    sendMessageToIframe({
-      from: "parent-app-preview",
-      reset_conversation: true,
-      reset_page_id: PAGE_ID,
-    });
+    /** Gửi message xuống SDK */
+    if (IFRAME_REF?.current?.contentWindow) {
+      IFRAME_REF.current?.contentWindow.postMessage(
+        {
+          from: "parent-app-preview",
+          reset_conversation: true,
+          reset_page_id: PAGE_ID,
+        },
+        "*"
+      );
+    }
   };
 
+  useEffect(() => {
+    if (RESET_GLOBAL) {
+      /** Nếu có page_id thì gọi hàm fetch public page */
+      handleReset();
+      /** Reset lại trạng thái */
+      dispatch(setResetGlobal(false));
+    }
+  }, [RESET_GLOBAL]);
+
+  useEffect(() => {
+    if (LOCALE_GLOBAL) {
+      /** Nếu có page_id thì gọi hàm fetch public page */
+      handleChangeLanguage(LOCALE_GLOBAL);
+    }
+  }, [LOCALE_GLOBAL]);
+
+  useEffect(() => {
+    /** Thêm event listener cho thông điệp */
+    window.addEventListener("message", handleMessage);
+
+    /** Hàm cleanup */
+    return () => {
+      /** Xóa event listener */
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+  /**
+   * Lưu trạng thái mở embed
+   */
+  const [is_open_embed, setIsOpenEmbed] = useState(false);
+  /** Hàm xử lý event post message từ cha */
+  const handleMessage = (event: MessageEvent) => {
+    let PAYLOAD: any;
+
+    try {
+      /** Nếu event.data là string, cố gắng parse nó */
+      PAYLOAD =
+        typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+    } catch (error) {
+      console.error("Lỗi khi parse event.data:", error);
+      return;
+    }
+
+    /** Lưu trạng thái mở embed */
+    setIsOpenEmbed(PAYLOAD?.is_show);
+  };
+
+  /** Hàm confirm */
   const handleChangeLanguage = (locale: any) => {
-    saveLocale(locale.toString());
-    setLocale(locale);
-    sendMessageToIframe({
-      from: "parent-app-preview",
-      locale: locale,
-      reset_page_id: PAGE_ID,
-    });
+    // setLocale(locale);
+    /** Gửi message xuống SDK */
+    if (IFRAME_REF?.current?.contentWindow) {
+      IFRAME_REF.current?.contentWindow.postMessage(
+        {
+          from: "parent-app-preview",
+          locale: locale,
+          reset_page_id: PAGE_ID,
+        },
+        "*"
+      );
+    }
   };
-
   return (
-    <div className="flex h-full w-full">
+    <div
+      className={`flex h-full w-full relative ${
+        DEVICE_GLOBAL === "mobile"
+          ? "max-w-[390px]"
+          : DEVICE_GLOBAL === "tablet"
+          ? "max-w-[768px]"
+          : ""
+      }`}
+    >
       {!IS_ONLINE && (
         <div className="flex justify-center items-center fixed inset-0 bg-red-500 p-2 h-8 text-white text-sm z-50">
           {t("disconnected")}
@@ -130,35 +177,72 @@ const Setting = () => {
           {t("reconnected")}
         </div>
       )}
-      <div className="flex flex-col gap-y-2 p-4 bg-white md:rounded-lg w-full md:w-1/2">
-        {/* <DividerY /> */}
-        <div className="flex flex-col gap-y-4">
-          <button
-            onClick={() => {
-              handleReset();
-            }}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded min-w-60 max-w-96 truncate"
-          >
-            {t("simulate_conversation")}
-          </button>
-          {/* <DividerY /> */}
-          <div className="flex gap-y-2 gap-x-4 items-center">
-            <span className="text-sm font-medium flex-shrink-0 ">
-              {t("language")}
-            </span>
-            <div className="w-full md:max-w-60">
-              <CustomSelectSearch
-                label={t("language")}
-                data={LANGUAGES}
-                selected={LANGUAGES.find((e) => e.value === locale)}
-                value={locale}
-                setSelected={(e) => {
-                  handleChangeLanguage(e.value);
-                }}
+      <div
+        id="BBH-EMBED-CONTAINER"
+        className="relative flex flex-col gap-y-2 flex-grow min-h-0 h-full bg-white md:rounded-lg w-full "
+      >
+        <style>{`
+      #BBH-EMBED-IFRAME {
+        // all: unset !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        
+        width: ${
+          DEVICE_GLOBAL === "mobile" && is_open_embed ? "100% !important" : ""
+        };
+        height: ${
+          DEVICE_GLOBAL === "mobile" && is_open_embed ? "100% !important" : ""
+        };
+        }
+    `}</style>
+
+        {PAGE_URL_GLOBAL ? (
+          <div className={`flex justify-center items-center w-full h-full `}>
+            <div
+              className={`bg-black rounded-md overflow-hidden h-full ${
+                DEVICE_GLOBAL === "mobile"
+                  ? "w-[390px] border border-gray-300 shadow-2xl"
+                  : DEVICE_GLOBAL === "tablet"
+                  ? "w-[768px] border border-gray-300 shadow-2xl"
+                  : "w-full"
+              }`}
+            >
+              <iframe
+                src={PAGE_URL_GLOBAL.toString()}
+                className="w-full h-full"
+                title="Iframe Preview"
               />
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col gap-y-2 gap-x-4 items-center p-10">
+            <span className="text-sm flex-shrink-0 ">
+              {t("enter_your_website")}
+            </span>
+            <div className="w-full md:max-w-60">
+              <input
+                type="text"
+                className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm"
+                placeholder={"https://retion.ai"}
+                value={page_url}
+                onChange={(e) => {
+                  setPageUrl(e.target.value);
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                dispatch(setSubPageUrlGlobal(page_url));
+              }}
+              className="flex  bg-blue-700 hover:bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-md items-center gap-2 cursor-pointer"
+            >
+              <ArrowPathIcon className="size-4" />
+              {t("preview")}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
